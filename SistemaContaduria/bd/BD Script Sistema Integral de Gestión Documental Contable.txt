@@ -1,0 +1,109 @@
+-- =============================================
+-- PROYECTO: Sistema Integral de Gestión Documental Contable
+-- MOTOR: SQL Server
+-- MÓDULO: Central (Backend & Admin)
+-- =============================================
+
+-- 1. CREACIÓN DE TABLAS DE SEGURIDAD Y ROLES
+-- ---------------------------------------------
+
+CREATE TABLE Roles (
+    RolID INT PRIMARY KEY IDENTITY(1,1),
+    NombreRol VARCHAR(50) NOT NULL, -- Administrador, Contador Senior, Auxiliar
+    Descripcion VARCHAR(255)
+);
+
+CREATE TABLE Usuarios (
+    UsuarioID INT PRIMARY KEY IDENTITY(1,1),
+    Nombres VARCHAR(100) NOT NULL,
+    Apellidos VARCHAR(100) NOT NULL,
+    Telefono VARCHAR(20),
+    CorreoElectronico VARCHAR(150) UNIQUE NOT NULL,
+    PasswordHash VARBINARY(MAX) NOT NULL,
+    Salt VARBINARY(MAX) NOT NULL,
+    RolID INT NOT NULL DEFAULT 3, -- Por defecto 'Auxiliar/Básico'
+    FechaRegistro DATETIME2 DEFAULT SYSDATETIME(),
+    EstaActivo BIT DEFAULT 1,
+    CONSTRAINT FK_Usuario_Rol FOREIGN KEY (RolID) REFERENCES Roles(RolID)
+);
+
+-- 2. GESTIÓN DE CLIENTES Y DOCUMENTOS (ISO/CALIDAD)
+-- ---------------------------------------------
+
+CREATE TABLE Clientes (
+    ClienteID INT PRIMARY KEY IDENTITY(1,1),
+    RFC VARCHAR(13) UNIQUE NOT NULL,
+    RazonSocial VARCHAR(200) NOT NULL,
+    RegimenFiscal VARCHAR(100),
+    ContadorAsignadoID INT,
+    CONSTRAINT FK_Cliente_Contador FOREIGN KEY (ContadorAsignadoID) REFERENCES Usuarios(UsuarioID)
+);
+
+CREATE TABLE EstadosDocumento (
+    EstadoID INT PRIMARY KEY,
+    NombreEstado VARCHAR(50) NOT NULL -- Borrador, Revisión, Aprobado, Obsoleto
+);
+
+CREATE TABLE Documentos (
+    DocID INT PRIMARY KEY IDENTITY(1,1),
+    ClienteID INT NOT NULL,
+    UsuarioSubidaID INT NOT NULL,
+    NombreArchivo VARCHAR(255) NOT NULL,
+    Extension VARCHAR(10) NOT NULL, -- PDF, XML, DOCX 
+    RutaStorage VARCHAR(MAX) NOT NULL,
+    EstadoID INT NOT NULL DEFAULT 1, -- Inicia en Borrador 
+    FechaCreacion DATETIME2 DEFAULT SYSDATETIME(),
+    Version INT DEFAULT 1,
+    CONSTRAINT FK_Doc_Cliente FOREIGN KEY (ClienteID) REFERENCES Clientes(ClienteID),
+    CONSTRAINT FK_Doc_Usuario FOREIGN KEY (UsuarioSubidaID) REFERENCES Usuarios(UsuarioID),
+    CONSTRAINT FK_Doc_Estado FOREIGN KEY (EstadoID) REFERENCES EstadosDocumento(EstadoID)
+);
+
+-- 3. MÓDULOS ADICIONALES: AUDITORÍA, CITAS Y TAREAS
+-- ---------------------------------------------
+
+CREATE TABLE AuditoriaDocumentos (
+    AuditID INT PRIMARY KEY IDENTITY(1,1),
+    DocID INT NOT NULL,
+    UsuarioID INT NOT NULL,
+    EstadoAnterior INT,
+    EstadoNuevo INT,
+    FechaCambio DATETIME2 DEFAULT SYSDATETIME(),
+    Observaciones VARCHAR(MAX),
+    CONSTRAINT FK_Audit_Doc FOREIGN KEY (DocID) REFERENCES Documentos(DocID),
+    CONSTRAINT FK_Audit_User FOREIGN KEY (UsuarioID) REFERENCES Usuarios(UsuarioID)
+);
+
+CREATE TABLE Tareas (
+    TareaID INT PRIMARY KEY IDENTITY(1,1),
+    AsignadoPorID INT NOT NULL,
+    ResponsableID INT NOT NULL,
+    Descripcion VARCHAR(MAX) NOT NULL,
+    Prioridad VARCHAR(20) CHECK (Prioridad IN ('Alta', 'Media', 'Baja')),
+    FechaVencimiento DATETIME2,
+    Completada BIT DEFAULT 0,
+    CONSTRAINT FK_Tarea_Asignador FOREIGN KEY (AsignadoPorID) REFERENCES Usuarios(UsuarioID),
+    CONSTRAINT FK_Tarea_Responsable FOREIGN KEY (ResponsableID) REFERENCES Usuarios(UsuarioID)
+);
+
+CREATE TABLE Citas (
+    CitaID INT PRIMARY KEY IDENTITY(1,1),
+    ClienteID INT NOT NULL,
+    ContadorID INT NOT NULL,
+    FechaHora DATETIME2 NOT NULL,
+    Motivo VARCHAR(255),
+    EstadoCita VARCHAR(50) DEFAULT 'Pendiente',
+    CONSTRAINT FK_Cita_Cliente FOREIGN KEY (ClienteID) REFERENCES Clientes(ClienteID),
+    CONSTRAINT FK_Cita_Contador FOREIGN KEY (ContadorID) REFERENCES Usuarios(UsuarioID)
+);
+
+-- 4. INSERCIÓN DE DATOS SEMILLA [cite: 22]
+-- ---------------------------------------------
+
+INSERT INTO Roles (NombreRol, Descripcion) VALUES 
+('Administrador', 'Acceso total al sistema y gestión de usuarios'),
+('Contador Senior', 'Gestión de clientes y aprobación de documentos'),
+('Auxiliar Contable', 'Carga de documentos y tareas básicas');
+
+INSERT INTO EstadosDocumento (EstadoID, NombreEstado) VALUES 
+(1, 'Borrador'), (2, 'Revisión'), (3, 'Aprobado'), (4, 'Obsoleto');e
