@@ -1,2 +1,2 @@
-FROM mcr.microsoft.com/mssql/server:2022-latest
-EXPOSE 1433
+FROM mcr.microsoft.com/mssql/server:2019-latest
+EXPOSE 1434

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Rz35fjhsucQ=",
+  "dgSpecHash": "qEjq7YKg9Ro=",
   "success": true,
-  "projectFilePath": "C:\\Users\\volub\\source\\repos\\QualityDocD\\QualityDocD\\QualityDocD.csproj",
+  "projectFilePath": "C:\\Users\\volub\\Desktop\\Contaduria\\ProyectoIntegrador\\src\\dotnet-core\\QualityDocD\\QualityDocD.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\volub\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\volub\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",

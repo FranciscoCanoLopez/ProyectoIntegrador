@@ -4834,11 +4834,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\volub\\source\\repos\\QualityDocD\\QualityDocD\\QualityDocD.csproj",
+      "projectUniqueName": "C:\\Users\\volub\\Desktop\\Contaduria\\ProyectoIntegrador\\src\\dotnet-core\\QualityDocD\\QualityDocD.csproj",
       "projectName": "QualityDocD",
-      "projectPath": "C:\\Users\\volub\\source\\repos\\QualityDocD\\QualityDocD\\QualityDocD.csproj",
+      "projectPath": "C:\\Users\\volub\\Desktop\\Contaduria\\ProyectoIntegrador\\src\\dotnet-core\\QualityDocD\\QualityDocD.csproj",
       "packagesPath": "C:\\Users\\volub\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\volub\\source\\repos\\QualityDocD\\QualityDocD\\obj\\",
+      "outputPath": "C:\\Users\\volub\\Desktop\\Contaduria\\ProyectoIntegrador\\src\\dotnet-core\\QualityDocD\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

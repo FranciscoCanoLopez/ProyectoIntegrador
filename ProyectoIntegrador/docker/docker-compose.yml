@@ -4,19 +4,18 @@ services:
   # =========================================================
   # MÓDULO 1: .NET CORE & SQL SERVER
   # =========================================================
-  # 1. Base de Datos SQL Server
+# 1. Base de Datos SQL Server
   sqlserver-db:
     build:
       context: ./SQLSERVER
       dockerfile: Dockerfile
     container_name: modulo1_sqlserver_container
     ports:
-      - "1433:1433"
+      - "14343:1433"
     environment:
       - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=ContaduriaSecure2026!
-    volumes:
-      - sqlserver_data:/var/opt/mssql
+      - MSSQL_SA_PASSWORD=Contaduria2026
+      - MSSQL_PID=Developer
 
   # 2. Aplicación Web .NET Core
   dotnet-app:

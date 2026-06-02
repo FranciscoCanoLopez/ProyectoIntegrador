@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("QualityDocD")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+81c0bc89749f6be8c45544cfe9218423e52642ba")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bb2d7d16b1647416cdbccc5c27ab9ad2afc60ae6")]
 [assembly: System.Reflection.AssemblyProductAttribute("QualityDocD")]
 [assembly: System.Reflection.AssemblyTitleAttribute("QualityDocD")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
