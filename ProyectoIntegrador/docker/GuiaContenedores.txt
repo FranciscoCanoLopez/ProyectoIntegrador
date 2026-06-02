@@ -98,7 +98,9 @@ PASOS:
     - Para acceder al Portal Administrativo (.NET): http://localhost:5000
     - Para validar la API de Metadatos (Node.js): http://localhost:3000
 
-Para apagar el entorno de forma segura, abra una terminal en la carpeta 
-donde reside el archivo docker-compose.yml y ejecute:
-   > docker-compose down
+Para apagar el entorno de forma segura, solo es dar DOBLE CLICK IZQUIERDO en
+el archivo "apagar_proyecto.bat"
+
+Verás una ventana negra que te mostrará cómo se van apagando y removiendo 
+los 6 servicios uno por uno de forma automática.
 ========================================================================
