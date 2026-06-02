@@ -1,0 +1,104 @@
+========================================================================
+       INSTRUCTIVO DE FUNCIONAMIENTO Y USO DEL ECOSISTEMA DOCKER
+========================================================================
+Proyecto: Sistema Integral de Gestión Documental y Contable
+Componentes: 6 Contenedores | 3 Módulos Integrados
+Plataforma Base: Docker Core / Docker Desktop
+
+------------------------------------------------------------------------
+1. ARQUITECTURA GENERAL Y MAPPING DE PUERTOS
+------------------------------------------------------------------------
+El sistema se compone de tres capas funcionales autónomas, cada una 
+equipada con su entorno de ejecución de código y su motor de base de 
+datos específico. Todos conviven en una red interna virtual administrada
+por Docker.
+
+MÓDULO 1: Administración y Carga (.NET Core 10 MVC + SQL Server)
+  - Servidor de Aplicación: [modulo1_dotnet_container] -> Puerto 5000:80
+  - Base de Datos:         [modulo1_sqlserver_container] -> Puerto 1433:1433
+
+MÓDULO 2: Portal de Consultas y Reportes (PHP 8 Apache + PostgreSQL)
+  - Servidor de Aplicación: [modulo2_php_container] -> Puerto 8080:80
+  - Base de Datos:         [modulo2_postgres_container] -> Puerto 5433:5432
+
+MÓDULO 3: Motor de Indexación (Node.js + MongoDB)
+  - Servidor de Aplicación: [modulo3_nodejs_container] -> Puerto 3000:3000
+  - Base de Datos:         [modulo3_mongodb_container] -> Puerto 27017:27017
+
+------------------------------------------------------------------------
+2. FUNCIONAMIENTO DETALLADO DE LOS CONTENEDORES
+------------------------------------------------------------------------
+
+A. Capa de Datos Relacionales (SQL Server & PostgreSQL)
+  - [modulo1_sqlserver_container]: Almacena la estructura rígida del 
+    sistema corporativo (Usuarios, Roles, Permisos de Contadores y Clientes).
+    Posee reglas de contraseña fuerte y aceptación de la licencia EULA.
+  - [modulo2_postgres_container]: Dedicado exclusivamente al almacenamiento
+    del historial transaccional, bitácoras de auditoría de consultas, 
+    e índices optimizados para el control del cumplimiento contable.
+
+B. Capa de Datos NoSQL (MongoDB)
+  - [modulo3_mongodb_container]: Diseñado para almacenar documentos JSON
+    flexibles con los metadatos dinámicos extraídos de los archivos (PDF,
+    XML, etc.). Permite búsquedas de texto complejas sin comprometer la
+    velocidad de las bases relacionales.
+
+C. Capa de Aplicaciones (Servidores Web y APIs)
+  - [modulo1_dotnet_container]: Ejecuta el binario compilado de C# .NET.
+    Provee la interfaz administrativa para subir los archivos originales.
+  - [modulo2_php_container]: Corre sobre un servidor Apache embebido en 
+    Linux. Incluye los drivers nativos 'pdo_pgsql' cargados dinámicamente 
+    en tiempo de construcción para comunicarse con Postgres.
+  - [modulo3_nodejs_container]: Ejecuta un entorno asíncrono con Node.js,
+    actuando como un servicio interno que lee y escribe metadatos en Mongo.
+
+------------------------------------------------------------------------
+3. MECANISMO DE INTERACCIÓN DEL EJECUTABLE (.BAT)
+------------------------------------------------------------------------
+El archivo "iniciar_proyecto.bat" funciona como un orquestador automatizado 
+para sistemas Windows. Su interacción con el sistema sigue este flujo:
+
+1. Resolución de Rutas Relativas:
+   Utiliza la variable interna de Windows "%~dp0" para identificar dónde
+   está parado el usuario. Desde ahí, navega automáticamente de forma 
+   relativa hacia el directorio "ProyectoIntegrador\docker", evitando que 
+   el usuario deba conocer rutas absolutas del disco duro.
+
+2. Comunicación con el Daemon de Docker:
+   Lanza la instrucción nativa "docker-compose up -d --build". Este comando 
+   despierta al motor de Docker Desktop, lee el archivo estructurado 
+   "docker-compose.yml" y ejecuta tres acciones en segundo plano (-d):
+     a) Descarga las imágenes oficiales base desde Docker Hub si no existen.
+     b) Ejecuta los "Dockerfiles" locales para compilar las dependencias 
+        e inyectar extensiones (como Apache/PHP con Postgres).
+     c) Monta volúmenes virtuales persistentes en el disco local para que 
+        los datos de las bases de datos no se borren al apagar el equipo.
+
+3. Diagnóstico de Salud del Sistema (Healthcheck):
+   Al finalizar la construcción, el script ejecuta automáticamente el 
+   comando "docker-compose ps", imprimiendo en la pantalla del usuario 
+   el estado actual y mapeo de puertos de los 6 contenedores para certificar
+   que el estado sea "Up" (Activo).
+
+------------------------------------------------------------------------
+4. INSTRUCCIONES DE USO Y DESPLIEGUE RÁPIDO
+------------------------------------------------------------------------
+Para levantar y operar la arquitectura completa, siga estos pasos:
+
+REQUISITO PREVIO: Tener instalado Docker Desktop en el equipo y asegurarse
+de que el motor esté encendido (icono de la ballena en color VERDE).
+
+PASOS:
+1. Navegue a la carpeta raíz del proyecto ("Contaduria").
+2. Dé DOBLE CLIC IZQUIERDO sobre el archivo "iniciar_proyecto.bat".
+3. Espere a que la consola de Windows finalice las descargas y muestre 
+   el reporte final de contenedores activos.
+4. Abra su navegador web de preferencia para interactuar con los módulos:
+    - Para acceder al Portal de Consultas (PHP): http://localhost:8080
+    - Para acceder al Portal Administrativo (.NET): http://localhost:5000
+    - Para validar la API de Metadatos (Node.js): http://localhost:3000
+
+Para apagar el entorno de forma segura, abra una terminal en la carpeta 
+donde reside el archivo docker-compose.yml y ejecute:
+   > docker-compose down
+========================================================================

@@ -1,0 +1,105 @@
+version: '3.8'
+
+services:
+  # =========================================================
+  # MÓDULO 1: .NET CORE & SQL SERVER
+  # =========================================================
+  # 1. Base de Datos SQL Server
+  sqlserver-db:
+    build:
+      context: ./SQLSERVER
+      dockerfile: Dockerfile
+    container_name: modulo1_sqlserver_container
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=ContaduriaSecure2026!
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+
+  # 2. Aplicación Web .NET Core
+  dotnet-app:
+    build:
+      context: ./DOTNET
+      dockerfile: Dockerfile
+    container_name: modulo1_dotnet_container
+    ports:
+      - "5000:80"                         # Acceso: http://localhost:5000
+    volumes:
+      - ../src/dotnet-core:/app           # Mapea a tu carpeta de código C#
+    depends_on:
+      - sqlserver-db
+
+  # =========================================================
+  # MÓDULO 2: PHP 8 & POSTGRESQL (NUESTRO MÓDULO)
+  # =========================================================
+  # 3. Base de Datos PostgreSQL
+  postgres-db:
+    image: postgres:15-alpine            # Usa la versión ligera Alpine oficial
+    container_name: modulo2_postgres_container
+    ports:
+      - "5433:5432"                       # Puerto externo 5433 para evitar conflictos locales
+    environment:
+      - POSTGRES_DB=sistema_gestion
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # 4. Aplicación Web PHP 8 (Apache)
+  php-app:
+    build:
+      context: ../src/php-app             # Apunta al directorio raíz de tu código PHP
+      dockerfile: ../../docker/PostgreSQL/Dockerfile
+    container_name: modulo2_php_container
+    ports:
+      - "8080:80"                         # Acceso: http://localhost:8080
+    volumes:
+      - ../src/php-app:/var/www/html      # Sincronización de código en tiempo real
+    environment:
+      - DB_HOST=postgres-db
+      - DB_NAME=sistema_gestion
+      - DB_USER=postgres
+      - DB_PASSWORD=password123
+      - DB_PORT=5432
+    depends_on:
+      - postgres-db
+
+  # =========================================================
+  # MÓDULO 3: NODE.JS & MONGODB
+  # =========================================================
+  # 5. Base de Datos MongoDB
+  mongodb-db:
+    build:
+      context: ./MongoDB
+      dockerfile: Dockerfile
+    container_name: modulo3_mongodb_container
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=secretmongo
+    volumes:
+      - mongodb_data:/data/db
+
+  # 6. Microservicio API en Node.js
+  nodejs-app:
+    build:
+      context: ./NodeJs
+      dockerfile: Dockerfile
+    container_name: modulo3_nodejs_container
+    ports:
+      - "3000:3000"                       # Acceso: http://localhost:3000
+    volumes:
+      - ../src/node-service:/usr/src/app  # Mapea a tu carpeta de Node.js
+    environment:
+      - MONGO_URI=mongodb://admin:secretmongo@mongodb-db:27017/metadatos?authSource=admin
+    depends_on:
+      - mongodb-db
+
+# Volúmenes globales compartidos para persistencia de datos físicos
+volumes:
+  sqlserver_data:
+  postgres_data:
+  mongodb_data:
