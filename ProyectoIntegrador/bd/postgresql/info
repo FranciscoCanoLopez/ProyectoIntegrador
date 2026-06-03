@@ -1,0 +1,8 @@
+El Módulo 2 es un microservicio dedicado exclusivamente a la 
+persistencia de logs y auditoría centralizada. 
+Las tablas de control de acceso, usuarios y roles 
+pertenecen al dominio del Módulo 1 (SQL Server), 
+garantizando así que si el Módulo 1 se cae, 
+el Módulo 2 siga operativo de forma independiente 
+para consultar el historial del sistema sin dependencias 
+rígidas ni llaves foráneas cruzadas entre contenedores."

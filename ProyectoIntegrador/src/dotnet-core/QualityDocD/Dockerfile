@@ -1,9 +1,9 @@
 ﻿# ── Etapa 1: Compilación ──────────────────────────────────────────────────────
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
-
+ 
 COPY QualityDocD.csproj ./
-RUN dotnet restore
+RUN dotnet restore 
 
 COPY . .
 RUN dotnet publish -c Release -o /app/publish --no-restore

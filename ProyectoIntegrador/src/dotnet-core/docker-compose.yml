@@ -1,0 +1,6 @@
+services:
+  qualitydocd:
+    image: ${DOCKER_REGISTRY-}qualitydocd
+    build:
+      context: .
+      dockerfile: QualityDocD/Dockerfile

@@ -11,7 +11,7 @@ services:
       dockerfile: Dockerfile
     container_name: modulo1_sqlserver_container
     ports:
-      - "14343:1433"
+      - "1434:1433"
     environment:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=Contaduria2026
@@ -45,7 +45,8 @@ services:
       - POSTGRES_PASSWORD=password123
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
+      - ../bd/postgresql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
   # 4. Aplicación Web PHP 8 (Apache)
   php-app:
     build:
@@ -61,7 +62,7 @@ services:
       - DB_NAME=sistema_gestion
       - DB_USER=postgres
       - DB_PASSWORD=password123
-      - DB_PORT=5432
+      - DB_PORT=5433
     depends_on:
       - postgres-db
 
