@@ -1,0 +1,71 @@
+/* ==========================================================================
+   NUEVAS REGLAS: BARRA LATERAL (SIDEBAR) FLUIDA Y COLAPSABLE
+   ========================================================================== */
+.sidebar {
+    width: 260px;
+    min-width: 260px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+}
+
+/* Estado Colapsado */
+.sidebar.collapsed {
+    width: 70px;
+    min-width: 70px;
+}
+
+.sidebar.collapsed .label-sidebar {
+    display: none !important; /* Oculta el texto */
+}
+
+.sidebar.collapsed .menu-link {
+    text-center: center;
+    padding: 0.75rem 0 !important;
+    display: flex;
+    justify-content: center;
+}
+
+.sidebar.collapsed .menu-link i {
+    margin-right: 0 !important; /* Quita el margen al estar el icono solo */
+    font-size: 1.3rem;
+}
+
+.menu-link {
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.menu-link:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.menu-link.active {
+    background-color: var(--azul-hover) !important;
+}
+
+/* Transición para el contenedor de contenido general */
+.transition-content {
+    transition: all 0.3s ease;
+}
+
+/* ==========================================================================
+   ESTILOS DE LA LÍNEA DE TIEMPO (TIMELINE VIEW)
+   ========================================================================== */
+.timeline {
+    padding-left: 10px;
+}
+
+.timeline-item {
+    padding-bottom: 5px;
+}
+
+.timeline-content {
+    border-radius: 8px;
+    background-color: #ffffff !important;
+    transition: transform 0.2s ease;
+}
+
+.timeline-content:hover {
+    transform: translateX(5px);
+    border-color: #cbd5e1 !important;
+}
