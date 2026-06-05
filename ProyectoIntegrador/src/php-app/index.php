@@ -36,7 +36,7 @@ try {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="/css/estilos.css" rel="stylesheet">
+    <link href="public/css/estilos.css" rel="stylesheet">
 </head>
 <body>
 
@@ -83,7 +83,15 @@ try {
                 <h4 class="fw-bold text-dark mb-0">🔒 Control de Auditoría</h4>
                 <small class="text-muted">Infraestructura del Módulo 2</small>
             </div>
-            <span class="badge bg-success p-2"><i class="bi bi-hdd-network me-1"></i> PostgreSQL (Puerto 5432)</span>
+            <div class="d-flex align-items-center gap-3">
+                <div class="form-check form-switch mb-0 fs-5">
+                    <input class="form-check-input" type="checkbox" id="btnDarkModeToggle" style="cursor: pointer;">
+                    <label class="form-check-label text-muted fs-6" for="btnDarkModeToggle" id="lblDarkMode">
+                        <i class="bi bi-moon-stars-fill me-1"></i> Modo Oscuro
+                    </label>
+                </div>
+                <span class="badge bg-success p-2"><i class="bi bi-hdd-network me-1"></i> PostgreSQL (Puerto 5432)</span>
+            </div>
         </div>
 
         <div class="container-fluid p-4 flex-grow-1">
@@ -216,6 +224,7 @@ try {
 
 <script>
     // 1. Alternador de despliegue del Sidebar (Toggle)
+    
     const sidebar = document.getElementById('sidebar');
     const btnToggleSidebar = document.getElementById('btnToggleSidebar');
     
@@ -224,6 +233,7 @@ try {
     });
 
     // 2. Control de navegación entre vistas (SPA simulation)
+
     const menuLinks = document.querySelectorAll('.menu-link');
     const views = document.querySelectorAll('.dashboard-view');
 
@@ -247,10 +257,17 @@ try {
         });
     });
 
+// ==========================================================================
     // 3. Renderizado de Gráficas de Chart.js con los datos parseados de PHP
+    // ==========================================================================
+    
+    // Declaramos las variables globales para que la función de modo oscuro pueda acceder a ellas
+    let chartPastel;
+    let chartBarras;
+
     // Gráfica de Pastel (Módulos)
     const ctxPastel = document.getElementById('chartPastel').getContext('2d');
-    new Chart(ctxPastel, {
+    chartPastel = new Chart(ctxPastel, {
         type: 'pie',
         data: {
             labels: ['.NET (Módulo 1)', 'PHP (Módulo 2)', 'NodeJS (Módulo 3)'],
@@ -260,12 +277,23 @@ try {
                 borderWidth: 2
             }]
         },
-        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        options: { 
+            responsive: true, 
+            plugins: { 
+                legend: { 
+                    position: 'bottom',
+                    labels: {
+                        // Inicializa con el color correcto si entran directo en modo oscuro
+                        color: localStorage.getItem('theme') === 'dark' ? '#f8fafc' : '#666666'
+                    }
+                } 
+            } 
+        }
     });
 
     // Gráfica de Barras (Acciones)
     const ctxBarras = document.getElementById('chartBarras').getContext('2d');
-    new Chart(ctxBarras, {
+    chartBarras = new Chart(ctxBarras, {
         type: 'bar',
         data: {
             labels: <?php echo json_encode(array_keys($accionesConteo)); ?>,
@@ -276,8 +304,89 @@ try {
                 borderRadius: 6
             }]
         },
-        options: { responsive: true, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+        options: { 
+            responsive: true, 
+            scales: { 
+                y: { 
+                    beginAtZero: true, 
+                    ticks: { 
+                        stepSize: 1,
+                        color: localStorage.getItem('theme') === 'dark' ? '#f8fafc' : '#666666'
+                    } 
+                },
+                x: {
+                    ticks: {
+                        color: localStorage.getItem('theme') === 'dark' ? '#f8fafc' : '#666666'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        color: localStorage.getItem('theme') === 'dark' ? '#f8fafc' : '#666666'
+                    }
+                }
+            }
+        }
     });
+
+    // ==========================================================================
+    // ESCUCHADOR Y LÓGICA DE CONTROL PARA EL MODO OSCURO (AGREGAR ESTO)
+    // ==========================================================================
+    const toggleDarkMode = document.getElementById('btnDarkModeToggle');
+    const lblDarkMode = document.getElementById('lblDarkMode');
+    
+    // 1. Validar el estado guardado previamente en el navegador al cargar la página
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    if (currentTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        if(toggleDarkMode) toggleDarkMode.checked = true;
+        if(lblDarkMode) lblDarkMode.innerHTML = '<i class="bi bi-sun-fill text-warning me-1"></i> Modo Claro';
+    }
+
+    // 2. Escuchar activamente los clics del usuario en el interruptor (Switch)
+    if(toggleDarkMode) {
+        toggleDarkMode.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                // Activar Modo Oscuro
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                if(lblDarkMode) lblDarkMode.innerHTML = '<i class="bi bi-sun-fill text-warning me-1"></i> Modo Claro';
+                actualizarGraficasParaModoOscuro(true);
+            } else {
+                // Activar Modo Claro
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+                if(lblDarkMode) lblDarkMode.innerHTML = '<i class="bi bi-moon-stars-fill me-1"></i> Modo Oscuro';
+                actualizarGraficasParaModoOscuro(false);
+            }
+        });
+    }
+
+    // 3. Función encargada de actualizar los textos de Chart.js en tiempo real
+    function actualizarGraficasParaModoOscuro(isDark) {
+        const colorTexto = isDark ? '#f8fafc' : '#666666';
+        
+        // Modificar las opciones de color de las instancias globales declaradas arriba
+        [chartPastel, chartBarras].forEach(chartInstance => {
+            if(chartInstance && chartInstance.options.plugins.legend) {
+                chartInstance.options.plugins.legend.labels.color = colorTexto;
+                
+                // Si la gráfica tiene ejes (como la de barras), actualiza los ticks
+                if(chartInstance.options.scales) {
+                    if(chartInstance.options.scales.y && chartInstance.options.scales.y.ticks) {
+                        chartInstance.options.scales.y.ticks.color = colorTexto;
+                    }
+                    if(chartInstance.options.scales.x && chartInstance.options.scales.x.ticks) {
+                        chartInstance.options.scales.x.ticks.color = colorTexto;
+                    }
+                }
+                // Redibuja la gráfica con los nuevos estilos de color
+                chartInstance.update();
+            }
+        });
+    }
+
 </script>
 </body>
 </html>

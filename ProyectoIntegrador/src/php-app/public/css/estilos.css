@@ -1,4 +1,75 @@
 /* ==========================================================================
+   PALETA DE COLORES PARA MODO OSCURO (OPTIMIZADO Y CORREGIDO)
+   ========================================================================== */
+[data-theme="dark"] {
+    --bg-principal: #0f172a;       /* Fondo pizarra oscuro */
+    --texto-oscuro: #f8fafc;       /* Texto claro */
+    --borde-suave: #334155;        /* Bordes gris oscuro */
+    --azul-hover: #1e40af;
+}
+
+/* 1. Cambiar los fondos contenedores de Bootstrap (.bg-light y .bg-white) */
+[data-theme="dark"] .bg-white, 
+[data-theme="dark"] .bg-light, 
+[data-theme="dark"] .card,
+[data-theme="dark"] footer {
+    background-color: #1e293b !important; /* Gris azulado oscuro de fondo */
+    color: #f8fafc !important;            /* Texto claro general */
+}
+
+/* Forzar que el fondo de toda la ventana sea pizarra oscuro */
+[data-theme="dark"] body {
+    background-color: #0f172a !important;
+}
+
+/* 2. Asegurar la visibilidad de los encabezados y etiquetas de texto oscuro */
+[data-theme="dark"] .text-dark,
+[data-theme="dark"] h1,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] p.text-muted,
+[data-theme="dark"] small.text-muted {
+    color: #cbd5e1 !important; /* Forzar gris claro/blanco para legibilidad */
+}
+
+/* 3. Forzar compatibilidad con las Tablas de Bootstrap 5 */
+[data-theme="dark"] .table {
+    color: #cbd5e1 !important;
+    --bs-table-color: #cbd5e1 !important;
+    --bs-table-bg: #1e293b !important; /* Fondo de la tabla oscuro */
+    border-color: #334155 !important;
+}
+
+/* Filas alternas (Cebras) en modo oscuro */
+[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > * {
+    --bs-table-bg-type: #161e2e !important; 
+    color: #f8fafc !important;
+}
+
+/* Efecto Hover en modo oscuro */
+[data-theme="dark"] .table-hover > tbody > tr:hover > * {
+    --bs-table-bg-type: #334155 !important; 
+    color: #ffffff !important;
+}
+
+/* 4. Línea de tiempo (Timeline) adaptada a la oscuridad */
+[data-theme="dark"] .timeline-content {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+[data-theme="dark"] .timeline-content p {
+    color: #cbd5e1 !important;
+}
+
+/* 5. Asegurar contraste en los Badges de Microservicios */
+[data-theme="dark"] .badge-dotnet { background-color: #512bd4 !important; color: #ffffff !important; }
+[data-theme="dark"] .badge-php { background-color: #777bb4 !important; color: #ffffff !important; }
+[data-theme="dark"] .badge-node { background-color: #339933 !important; color: #ffffff !important; }
+[data-theme="dark"] .action-badge { background-color: #334155 !important; color: #f8fafc !important; border-color: #475569 !important; }
+
+
+/* ==========================================================================
    NUEVAS REGLAS: BARRA LATERAL (SIDEBAR) FLUIDA Y COLAPSABLE
    ========================================================================== */
 .sidebar {
@@ -19,14 +90,14 @@
 }
 
 .sidebar.collapsed .menu-link {
-    text-center: center;
+    text-align: center;
     padding: 0.75rem 0 !important;
     display: flex;
     justify-content: center;
 }
 
 .sidebar.collapsed .menu-link i {
-    margin-right: 0 !important; /* Quita el margen al estar el icono solo */
+    margin-right: 0 !important; 
     font-size: 1.3rem;
 }
 
