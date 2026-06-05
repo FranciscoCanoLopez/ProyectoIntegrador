@@ -1,5 +1,5 @@
 /* ==========================================================================
-   PALETA DE COLORES PARA MODO OSCURO (OPTIMIZADO Y CORREGIDO)
+   PALETA DE COLORES PARA MODO OSCURO (OPTIMIZADO PARA INDEX Y DETALLES)
    ========================================================================== */
 [data-theme="dark"] {
     --bg-principal: #0f172a;       /* Fondo pizarra oscuro */
@@ -8,7 +8,7 @@
     --azul-hover: #1e40af;
 }
 
-/* 1. Cambiar los fondos contenedores de Bootstrap (.bg-light y .bg-white) */
+/* 1. Cambiar los fondos contenedores (.bg-light, .bg-white, tarjetas y footer) */
 [data-theme="dark"] .bg-white, 
 [data-theme="dark"] .bg-light, 
 [data-theme="dark"] .card,
@@ -22,13 +22,16 @@
     background-color: #0f172a !important;
 }
 
-/* 2. Asegurar la visibilidad de los encabezados y etiquetas de texto oscuro */
+/* 2. Asegurar la visibilidad de encabezados, textos oscuros y muted */
 [data-theme="dark"] .text-dark,
+[data-theme="dark"] .text-muted,
+[data-theme="dark"] .text-secondary,
 [data-theme="dark"] h1,
 [data-theme="dark"] h4,
 [data-theme="dark"] h5,
-[data-theme="dark"] p.text-muted,
-[data-theme="dark"] small.text-muted {
+[data-theme="dark"] p,
+[data-theme="dark"] small,
+[data-theme="dark"] strong {
     color: #cbd5e1 !important; /* Forzar gris claro/blanco para legibilidad */
 }
 
@@ -62,11 +65,76 @@
     color: #cbd5e1 !important;
 }
 
-/* 5. Asegurar contraste en los Badges de Microservicios */
-[data-theme="dark"] .badge-dotnet { background-color: #512bd4 !important; color: #ffffff !important; }
-[data-theme="dark"] .badge-php { background-color: #777bb4 !important; color: #ffffff !important; }
-[data-theme="dark"] .badge-node { background-color: #339933 !important; color: #ffffff !important; }
-[data-theme="dark"] .action-badge { background-color: #334155 !important; color: #f8fafc !important; border-color: #475569 !important; }
+/* --- ESTILOS GENERALES Y MODO CLARO (Por defecto) --- */
+.badge-dotnet, .badge-php, .badge-node {
+    padding: 0.35em 0.65em;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+/* Colores pasteles con buen contraste de texto para el Modo Claro */
+.badge-dotnet { 
+    background-color: #e6e6fa !important; /* Morado tenue */
+    color: #512bd4 !important;            /* Texto morado .NET */
+}
+
+.badge-php { 
+    background-color: #f0f1fa !important;  /* Azul grisáceo sutil */
+    color: #4f5b93 !important;             /* Texto azul PHP corregido para contraste */
+}
+
+.badge-node { 
+    background-color: #eaf5ea !important; /* Verde tenue */
+    color: #215721 !important;            /* Texto verde Node oscuro legible */
+}
+
+/* --- ADAPTACIÓN PARA MODO OSCURO --- */
+/* Cambia el fondo a colores sólidos e intensos y el texto a blanco */
+[data-theme="dark"] .badge-dotnet { 
+    background-color: #512bd4 !important; 
+    color: #ffffff !important; 
+}
+[data-theme="dark"] .badge-php { 
+    background-color: #777bb4 !important; 
+    color: #ffffff !important; 
+}
+[data-theme="dark"] .badge-node { 
+    background-color: #339933 !important; 
+    color: #ffffff !important; 
+}
+
+/* Estilo para el badge de acciones (como LOGIN, INITIALIZATION) */
+.action-badge { 
+    background-color: #f1f5f9; 
+    color: #334155; 
+    border: 1px solid #cbd5e1; 
+}
+[data-theme="dark"] .action-badge { 
+    background-color: #334155 !important; 
+    color: #f8fafc !important; 
+    border-color: #475569 !important; 
+}
+
+/* 6. CORRECCIÓN EXCLUSIVA PARA DETALLES.PHP: Bloque de datos JSONB y etiquetas Code */
+[data-theme="dark"] .card-body pre {
+    background-color: #0f172a !important; /* Fondo negro pizarra profundo para el JSON */
+    border: 1px solid #334155 !important;
+}
+
+[data-theme="dark"] .card-body pre code {
+    color: #38bdf8 !important;            /* Texto celeste eléctrico legible de terminal */
+}
+
+[data-theme="dark"] .card-body code.text-primary {
+    color: #60a5fa !important;            /* Resaltar el nombre del usuario (admin) en azul claro */
+}
+
+[data-theme="dark"] .border-bottom {
+    border-color: #334155 !important;    /* Cambiar líneas separadoras a un gris sutil */
+}
 
 
 /* ==========================================================================

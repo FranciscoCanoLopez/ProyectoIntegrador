@@ -126,7 +126,11 @@ try {
                                             if (strpos($log['modulo_origen'], 'NodeJS') !== false) $badgeClass = 'badge-node';
                                         ?>
                                             <tr>
-                                                <td><strong>#<?php echo $log['id']; ?></strong></td>
+                                                <td>
+                                                    <a href="detalles.php?id=<?php echo $log['id']; ?>" class="text-decoration-none fw-bold text-primary">
+                                                        <i class="bi bi-search me-1" style="font-size: 0.8rem;"></i>#<?php echo $log['id']; ?>
+                                                    </a>
+                                                </td>
                                                 <td><span class="badge <?php echo $badgeClass; ?> d-block p-2"><?php echo htmlspecialchars($log['modulo_origen']); ?></span></td>
                                                 <td><code class="text-dark fw-bold"><?php echo htmlspecialchars($log['usuario']); ?></code></td>
                                                 <td><span class="badge bg-light text-dark border action-badge"><?php echo htmlspecialchars($log['accion']); ?></span></td>
