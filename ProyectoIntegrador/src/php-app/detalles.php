@@ -56,13 +56,16 @@ try {
                 <small class="text-muted">Visualizando Registro de Bitácora #<?php echo $log['id']; ?></small>
             </div>
             <div class="d-flex align-items-center gap-3">
-                <div class="form-check form-switch mb-0 fs-5">
+                <div class="form-check form-switch mb-0 fs-5 no-print">
                     <input class="form-check-input" type="checkbox" id="btnDarkModeToggle" style="cursor: pointer;">
                     <label class="form-check-label text-muted fs-6" for="btnDarkModeToggle" id="lblDarkMode">
                         <i class="bi bi-moon-stars-fill me-1"></i> Modo Oscuro
                     </label>
                 </div>
-                <a href="index.php" class="btn btn-sm btn-outline-primary"><i class="bi bi-arrow-left me-1"></i> Volver a la Bitácora</a>
+                <button onclick="window.print()" class="btn btn-sm btn-outline-secondary no-print">
+                    <i class="bi bi-printer me-1"></i> Imprimir Reporte / PDF
+                </button>
+                <a href="index.php" class="btn btn-sm btn-outline-primary no-print"><i class="bi bi-arrow-left me-1"></i> Volver a la Bitácora</a>
             </div>
         </div>
 

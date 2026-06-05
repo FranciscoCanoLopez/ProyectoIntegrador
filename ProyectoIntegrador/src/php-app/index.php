@@ -98,8 +98,11 @@ try {
             
             <div id="vista-bitacora" class="dashboard-view">
                 <div class="card shadow-sm border-0">
-                    <div class="card-header card-header-custom py-3">
-                        <h5 class="mb-0 fw-semibold"><i class="bi bi-list-task me-2"></i>Registros de Auditoría Recientes (Datos Semilla)</h5>
+                    <div class="card-header card-header-custom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <h5 class="mb-0 fw-semibold"><i class="bi bi-list-task me-2"></i>Registros de Auditoría Recientes</h5>
+                        <a href="exportar_csv.php" class="btn btn-sm btn-success shadow-sm d-flex align-items-center fw-bold px-3">
+                            <i class="bi bi-file-earmark-excel me-2 fs-6"></i> Exportar a Excel (CSV)
+                        </a>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
