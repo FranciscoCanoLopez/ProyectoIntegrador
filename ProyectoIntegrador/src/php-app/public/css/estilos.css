@@ -208,3 +208,33 @@
     transform: translateX(5px);
     border-color: #cbd5e1 !important;
 }
+
+/* ==========================================================================
+   CONFIGURACIÓN PARA IMPRESIÓN LIMPIA DE REPORTES A PDF
+   ========================================================================== */
+@media print {
+    /* Ocultar botones, el switch de modo oscuro y barras de navegación en el archivo PDF */
+    .no-print, #btnDarkModeToggle, .form-check, .btn {
+        display: none !important;
+    }
+    /* Forzar fondo totalmente blanco y texto negro absoluto para impresión física o PDF */
+    body, .card, .card-body, .bg-light, .bg-white, .bg-dark-subtle, .footer {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+    .card {
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+    }
+    .text-dark, .text-muted, .text-secondary, h4, h5, p, small, strong, code {
+        color: #000000 !important;
+    }
+    /* El bloque de código JSONB se imprimirá con fondo gris tenue y texto negro */
+    .card-body pre {
+        background-color: #f8f9fa !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+    .card-body pre code.text-dark {
+        color: #000000 !important;
+    }
+}
