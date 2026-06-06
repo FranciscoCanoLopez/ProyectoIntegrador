@@ -49,22 +49,26 @@ services:
     restart: always
   # 4. Aplicación Web PHP 8 (Apache)
   php-app:
-    build:
-      context: ../src/php-app             # Apunta al directorio raíz de tu código PHP
-      dockerfile: ../../docker/PostgreSQL/Dockerfile
-    container_name: modulo2_php_container
-    ports:
-      - "8080:80"                         # Acceso: http://localhost:8080
-    volumes:
-      - ../src/php-app:/var/www/html      # Sincronización de código en tiempo real
-    environment:
-      - DB_HOST=postgres-db
-      - DB_NAME=sistema_gestion
-      - DB_USER=postgres
-      - DB_PASSWORD=password123
-      - DB_PORT=5433
-    depends_on:
-      - postgres-db
+      build:
+        context: ../src/php-app
+        dockerfile: ../../docker/PostgreSQL/Dockerfile
+      container_name: modulo2_php_container
+      ports:
+        - "8080:80"
+      volumes:
+        - ../src/php-app:/var/www/html
+      environment:
+        - DB_HOST=postgres-db
+        - DB_NAME=sistema_gestion
+        - DB_USER=postgres
+        - DB_PASSWORD=password123
+        - DB_PORT=5433
+        - SMTP_HOST=smtp.gmail.com
+        - SMTP_PORT=587
+        - SMTP_USER=proyec738@gmail.com
+        - SMTP_PASS=jniwlqmuaftkzhkg  # Tu contraseña de aplicación de 16 letras juntas
+      depends_on:
+        - postgres-db
 
   # =========================================================
   # MÓDULO 3: NODE.JS & MONGODB

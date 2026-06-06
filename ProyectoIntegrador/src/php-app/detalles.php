@@ -62,9 +62,32 @@ try {
                         <i class="bi bi-moon-stars-fill me-1"></i> Modo Oscuro
                     </label>
                 </div>
-                <button onclick="window.print()" class="btn btn-sm btn-outline-secondary no-print">
-                    <i class="bi bi-printer me-1"></i> Imprimir Reporte / PDF
-                </button>
+                
+                <div class="dropdown no-print">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuReporte" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-file-earmark-pdf me-1"></i> Acciones del Reporte
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="dropdownMenuReporte">
+                        <li>
+                            <button class="dropdown-item" type="button" onclick="exportarPDF('descargar')">
+                                <i class="bi bi-download me-2 text-primary"></i> Descargar PDF
+                            </button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" type="button" onclick="exportarPDF('imprimir')">
+                                <i class="bi bi-printer me-2 text-success"></i> Imprimir Directamente
+                            </button>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <button class="dropdown-item" type="button" onclick="enviarPorCorreo(<?php echo $log['id']; ?>)">
+                                <i class="bi bi-envelope me-2 text-warning"></i> Enviar por Correo
+                            </button>
+                        </li>
+                    </ul>
+                </div>
                 <a href="index.php" class="btn btn-sm btn-outline-primary no-print"><i class="bi bi-arrow-left me-1"></i> Volver a la Bitácora</a>
             </div>
         </div>
@@ -133,8 +156,10 @@ try {
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-    // LÓGICA DE CONTROL PARA EL MODO OSCURO (Sincronizado con index)
+    // 1. LÓGICA DE CONTROL PARA EL MODO OSCURO (Sincronizado con index)
     const toggleDarkMode = document.getElementById('btnDarkModeToggle');
     const lblDarkMode = document.getElementById('lblDarkMode');
     
@@ -156,6 +181,76 @@ try {
                 localStorage.setItem('theme', 'light');
                 if(lblDarkMode) lblDarkMode.innerHTML = '<i class="bi bi-moon-stars-fill me-1"></i> Modo Oscuro';
             }
+        });
+    }
+
+    // 2. LÓGICA DE MANEJO DE PDF / IMPRESIÓN DEL NAVEGADOR
+    function exportarPDF(accion) {
+        if (accion === 'imprimir') {
+            window.print();
+        } else if (accion === 'descargar') {
+            // Modifica dinámicamente el título del DOM para forzar el nombre sugerido al guardar en PDF
+            const tituloOriginal = document.title;
+            document.title = "Reporte_Auditoria_Registro_#" + "<?php echo $log['id']; ?>";
+            
+            window.print();
+            
+            // Restaura el nombre real de la pestaña en el navegador inmediatamente
+            document.title = tituloOriginal;
+        }
+    }
+
+    // 3. LOGICA COMPLETA DE PETICIÓN ASÍNCRONA (AJAX) PARA ENVÍO DE REPORTE POR CORREO
+    function enviarPorCorreo(idRegistro) {
+        const correo = prompt("Introduce el correo electrónico del destinatario para enviar el Reporte:");
+        
+        // Si el usuario presiona Cancelar o lo deja en blanco, interrumpir la función
+        if (!correo) return;
+        
+        // Expresión regular sintáctica estándar para validar correos antes de ir al servidor
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!regex.test(correo)) {
+            alert("❌ La dirección de correo electrónico introducida no tiene un formato válido.");
+            return;
+        }
+
+        // Efecto Loading visual deshabilitando el menú temporalmente
+        const btnDropdown = document.getElementById('dropdownMenuReporte');
+        const contenidoOriginalBtn = btnDropdown.innerHTML;
+        btnDropdown.disabled = true;
+        btnDropdown.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Enviando...';
+
+        // Ejecutar envío por Fetch API hacia el endpoint backend de PHP
+        fetch('api/enviar_detalle_correo.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: idRegistro,
+                email: correo
+            })
+        })
+        .then(response => {
+            // Validar errores HTTP de red o servidor no controlados
+            if (!response.ok) {
+                return response.json().then(err => { throw new Error(err.message || 'Error desconocido en el servidor.'); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Despliegue de notificación de éxito real
+            alert("✔️ ¡Excelente! " + data.message);
+        })
+        .catch(error => {
+            // Captura de excepciones
+            alert("❌ Ocurrió un inconveniente: " + error.message);
+            console.error("Detalles técnicos del error: ", error);
+        })
+        .finally(() => {
+            // Restaurar el botón a su estado normal e interactivo
+            btnDropdown.disabled = false;
+            btnDropdown.innerHTML = contenidoOriginalBtn;
         });
     }
 </script>
