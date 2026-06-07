@@ -1,0 +1,98 @@
+Módulo 2: Sistema de Inspección, Auditoría de Bitácoras y Notificaciones Automatizadas
+
+📝 Descripción del Módulo
+
+Este módulo proporciona una solución de infraestructura 
+robusta y segura para la auditoría de eventos críticos dentro del 
+ecosistema corporativo del sistema de gestión. 
+Su objetivo principal es garantizar el no repudio, 
+la trazabilidad fiscal/contable y la transparencia de TI, 
+permitiendo a los auditores e ingenieros de sistemas 
+inspeccionar las acciones realizadas por los usuarios, 
+analizar los payloads de datos en formato binario (JSONB) 
+y despachar reportes formales automatizados directos a bandejas 
+de correo electrónico a través de protocolos seguros.
+
+
+
+🛠️ Tecnologías y Arquitectura Utilizadas
+
+
+
+La solución se construyó bajo una arquitectura 
+de microservicios contenerizada e inmune a discrepancias de entornos locales:
+
+Backend Core: PHP 8.1+ (Ejecutándose en un entorno Apache integrado).
+
+Base de Datos: PostgreSQL (Soporte avanzado para auditoría relacional y almacenamiento NoSQL híbrido).
+
+Manejador de Dependencias & Correo: Composer + PHPMailer (Cifrado síncrono TLS).
+
+Infraestructura: Docker & Docker Compose (Aislamiento completo de servicios y redes internas).
+
+Frontend: JavaScript (Fetch API asíncrono) para la interacción sin recarga de página.
+
+
+
+🚀 Desglose de Implementaciones y Soluciones Técnicas
+
+
+
+A lo largo del desarrollo del módulo se resolvieron retos críticos de infraestructura y desarrollo de software:
+
+1. Modelado de Datos y Persistencia (PostgreSQL)
+
+Se diseñó la tabla audit_logs optimizada para almacenar 
+metadatos de auditoría: origen del módulo, usuario operador, 
+acción ejecutada, tabla afectada, dirección IP y marcas de tiempo (timestamp).
+
+Se implementó una columna de tipo JSONB (valores_nuevos) 
+para guardar el estado exacto del payload modificado. 
+Esto permite realizar auditorías no estructuradas de alta 
+velocidad sin comprometer el rendimiento relacional 
+de la base de datos.
+
+2. desacoplamiento de Credenciales y Seguridad de Entorno (Docker)
+
+Se migró el almacenamiento de credenciales sensibles 
+(claves de bases de datos y contraseñas de aplicaciones de Google) 
+fuera del código fuente plano de la API.
+
+Solución a baches de red/infraestructura: 
+Ante la corrupción o descarga incompleta de dependencias como vlucas/phpdotenv 
+en entornos contenerizados, se reestructuró el archivo docker-compose.yml 
+para utilizar la inyección nativa a través del bloque environment.
+
+Se corrigieron las discrepancias de mapeo de rutas 
+relativas de volumen entre el host Windows y el contenedor 
+Docker Linux (../src/php-app vs /var/www/html).
+
+3. API REST y Sanitización de Peticiones en PHP (enviar_detalle_correo.php)
+
+Se desarrolló un endpoint robusto que ejecuta las siguientes fases defensivas:
+
+Restricción de Métodos: Rechaza cualquier petición que no sea estrictamente POST 
+(Código de estado 405 Method Not Allowed).
+
+Filtros de Seguridad: Sanitiza y valida las entradas asíncronas del frontend 
+utilizando FILTER_VALIDATE_INT para los IDs del log y FILTER_VALIDATE_EMAIL 
+para los destinatarios finales.
+
+Manejo Ciego de Errores: Se desactivaron los errores visuales en caliente 
+(display_errors = 0) para evitar fugas de información (Information Disclosure) 
+y proteger la pureza del flujo JSON esperado por el Frontend.
+
+4. Motor de Notificación Seguro (PHPMailer + SMTP Google)
+
+Se integró PHPMailer abstrayendo la lógica SMTP comercial.
+
+Se configuró el transporte seguro utilizando el puerto 587 con cifrado explícito STARTTLS.
+
+Se implementó la autenticación mediante Contraseñas de Aplicación de Google 
+(tokens de 16 caracteres), eludiendo el bloqueo de aplicaciones menos seguras de 
+Gmail y garantizando el cumplimiento de las normativas de seguridad de identidad de Google.
+
+El cuerpo del correo se estructuró utilizando un diseño HTML 
+inline adaptativo (estilos inline embebidos) compatible con clientes de correo modernos 
+(Gmail, Outlook), formateando dinámicamente los objetos JSONB con sangrías estéticas 
+(JSON_PRETTY_PRINT).
