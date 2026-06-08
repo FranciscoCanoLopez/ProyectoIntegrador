@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 3 - Motor de Búsqueda Inteligente</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        .json-block { font-family: monospace; white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+
+    <header class="bg-slate-950 border-b border-slate-800 p-6 shadow-xl">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                    🔍 Módulo 3: Servicio de Búsqueda Inteligente
+                </h1>
+                <p class="text-sm text-slate-400 mt-1">Indexación NoSQL de metadatos dinámicos mediante MongoDB & Node.js</p>
+            </div>
+            <div class="bg-emerald-500/10 text-emerald-400 text-xs font-semibold px-3 py-1.5 rounded-full border border-emerald-500/30 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> API Microservicio Activa
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-6 space-y-6">
+        
+        <section class="bg-slate-950 p-6 rounded-xl border border-slate-800 shadow-md">
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1 relative">
+                    <input type="text" id="searchInput" 
+                        placeholder="Buscar por usuario, acción, módulo o contenido del payload (Ej: Revisor, Manual)..." 
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition">
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="realizarBusqueda()" class="bg-blue-600 hover:bg-blue-500 text-white font-medium px-6 py-3 rounded-lg transition shadow-lg cursor-pointer">
+                        Buscar
+                    </button>
+                    <button onclick="limpiarFiltros()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-4 py-3 rounded-lg transition cursor-pointer">
+                        Limpiar
+                    </button>
+                </div>
+            </div>
+
+            <div class="mt-4 flex flex-wrap items-center gap-2 text-sm text-slate-400">
+                <span class="font-medium text-slate-500">Filtrar por etiqueta ANSI:</span>
+                <button onclick="filtrarPorEtiqueta('modulo_3_nodejs')" class="bg-slate-800 hover:bg-slate-700 hover:text-white px-2.5 py-1 rounded-md text-xs font-mono transition cursor-pointer">#modulo_3_nodejs</button>
+                <button onclick="filtrarPorEtiqueta('revisor')" class="bg-slate-800 hover:bg-slate-700 hover:text-white px-2.5 py-1 rounded-md text-xs font-mono transition cursor-pointer">#revisor</button>
+                <button onclick="filtrarPorEtiqueta('search_document')" class="bg-slate-800 hover:bg-slate-700 hover:text-white px-2.5 py-1 rounded-md text-xs font-mono transition cursor-pointer">#search_document</button>
+            </div>
+        </section>
+
+        <div class="text-sm text-slate-400 flex justify-between items-center px-2">
+            <span>Resultados encontrados: <strong id="totalCounter" class="text-blue-400">0</strong></span>
+            <span class="text-xs text-slate-500">Persistencia: MongoDB BSON</span>
+        </div>
+
+        <section id="logsContainer" class="space-y-4">
+            <div class="text-center py-12 text-slate-500">
+                Cargando metadatos del motor NoSQL...
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api/notificaciones/buscar';
+
+        // Al cargar la página, traer todos los registros de inmediato
+        document.addEventListener('DOMContentLoaded', () => {
+            realizarBusqueda();
+
+            // Permitir buscar presionando la tecla Enter
+            document.getElementById('searchInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') realizarBusqueda();
+            });
+        });
+
+        async function realizarBusqueda(endpoint = API_URL) {
+            const container = document.getElementById('logsContainer');
+            const query = document.getElementById('searchInput').value.trim();
+            
+            let url = endpoint;
+            if (query && endpoint === API_URL) {
+                url = `${API_URL}?query=${encodeURIComponent(query)}`;
+            }
+
+            try {
+                const response = await fetch(url);
+                const result = await response.json();
+
+                document.getElementById('totalCounter').textContent = result.total_resultados || 0;
+                container.innerHTML = '';
+
+                if (!result.data || result.data.length === 0) {
+                    container.innerHTML = `
+                        <div class="bg-slate-950 p-8 rounded-xl text-center text-slate-500 border border-slate-800 shadow-md">
+                            ❌ No se encontraron coincidencias en la indexación de MongoDB.
+                        </div>`;
+                    return;
+                }
+
+                result.data.forEach(log => {
+                    // Dar formato legible al JSON dinámico
+                    const jsonPretty = JSON.stringify(log.valores_nuevos, null, 4);
+                    
+                    // Construir las insignias de las etiquetas
+                    const badges = log.etiquetas.map(tag => 
+                        `<span class="bg-blue-950 text-blue-300 text-[11px] font-mono px-2 py-0.5 rounded border border-blue-800/50">#${tag}</span>`
+                    ).join(' ');
+
+                    const card = document.createElement('div');
+                    card.className = "bg-slate-950 rounded-xl border border-slate-800 shadow-lg overflow-hidden transition hover:border-slate-700";
+                    card.innerHTML = `
+                        <div class="bg-slate-900/50 px-6 py-4 border-b border-slate-800 flex flex-wrap justify-between items-center gap-2">
+                            <div class="flex items-center gap-3">
+                                <span class="bg-slate-800 text-slate-300 text-xs font-mono px-2 py-1 rounded">ID Relacional: ${log.id_referencia}</span>
+                                <span class="text-sm font-semibold text-white">${log.modulo_origen}</span>
+                            </div>
+                            <span class="text-xs text-slate-500">${new Date(log.fecha_registro).toLocaleString()}</span>
+                        </div>
+                        
+                        <div class="p-6 space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                <div>
+                                    <span class="block text-xs font-medium text-slate-500 uppercase tracking-wider">Usuario Responsable</span>
+                                    <strong class="text-blue-400 font-mono">${log.usuario}</strong>
+                                </div>
+                                <div>
+                                    <span class="block text-xs font-medium text-slate-500 uppercase tracking-wider">Acción Indexada</span>
+                                    <span class="inline-block mt-0.5 bg-slate-800 text-slate-200 text-xs font-bold px-2 py-0.5 rounded border border-slate-700">${log.accion}</span>
+                                </div>
+                                <div>
+                                    <span class="block text-xs font-medium text-slate-500 uppercase tracking-wider">Dirección IP Host</span>
+                                    <span class="font-mono text-slate-300 text-xs">${log.direccion_ip || 'N/D'}</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <span class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-1.5">Tokens / Etiquetas ANSI Indexadas:</span>
+                                <div class="flex flex-wrap gap-1.5">${badges}</div>
+                            </div>
+
+                            <div>
+                                <span class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-1.5">Estructura Dinámica Documental (BSON Payload):</span>
+                                <pre class="bg-slate-900 border border-slate-800 p-4 rounded-lg text-slate-300 text-xs overflow-x-auto json-block">${escapeHtml(jsonPretty)}</pre>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="bg-red-950/20 p-6 rounded-xl text-center text-red-400 border border-red-900/30 shadow-md">
+                        ❌ Error de comunicación con la API del microservicio de Node.js: ${error.message}
+                    </div>`;
+            }
+        }
+
+        function filtrarPorEtiqueta(tag) {
+            document.getElementById('searchInput').value = '';
+            realizarBusqueda(`${API_URL}?etiqueta=${tag}`);
+        }
+
+        function limpiarFiltros() {
+            document.getElementById('searchInput').value = '';
+            realizarBusqueda();
+        }
+
+        function escapeHtml(text) {
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>

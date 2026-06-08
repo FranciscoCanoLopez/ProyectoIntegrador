@@ -9,6 +9,8 @@ const PORT = process.env.PORT || 3000;
 // Middlewares globales
 app.use(cors());
 app.use(express.json());
+// Servir los archivos estáticos del frontend desde la carpeta "public"
+app.use(express.static('public'));
 
 // --- CONEXIÓN AUTOMÁTICA CON CREDENCIALES A MONGODB ---
 // Toma la URI inyectada por tu docker-compose, o usa la de respaldo exacta
