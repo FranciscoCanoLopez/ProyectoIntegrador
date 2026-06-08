@@ -1,64 +1,81 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Módulo 3 - Motor de Búsqueda Inteligente</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <style>
+    <style type="text/tailwindcss">
+        /* Configuración obligatoria para indicarle a Tailwind v4 que use estrategia por clase */
+        @variant dark (&:where(.dark, .dark *));
+        
         .json-block { font-family: monospace; white-space: pre-wrap; word-wrap: break-word; }
+        
+        /* Transición global suave al alternar entre temas */
+        body, header, section, div, input, pre, button {
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 200ms;
+        }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen">
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 min-h-screen">
 
-    <header class="bg-slate-950 border-b border-slate-800 p-6 shadow-xl">
+    <header class="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 p-6 shadow-sm dark:shadow-xl">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
-                <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
                     🔍 Módulo 3: Servicio de Búsqueda Inteligente
                 </h1>
-                <p class="text-sm text-slate-400 mt-1">Indexación NoSQL de metadatos dinámicos mediante MongoDB & Node.js</p>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Indexación NoSQL de metadatos dinámicos mediante MongoDB & Node.js</p>
             </div>
-            <div class="bg-emerald-500/10 text-emerald-400 text-xs font-semibold px-3 py-1.5 rounded-full border border-emerald-500/30 flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> API Microservicio Activa
+            
+            <div class="flex items-center gap-3">
+                <button onclick="toggleTheme()" id="themeToggleBtn" class="bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-700 transition cursor-pointer flex items-center gap-1.5 shadow-sm">
+                    🌞 Modo Claro
+                </button>
+
+                <div class="bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 text-xs font-semibold px-3 py-1.5 rounded-full border border-emerald-200 dark:border-emerald-500/30 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse"></span> API Microservicio Activa
+                </div>
             </div>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto p-6 space-y-6">
         
-        <section class="bg-slate-950 p-6 rounded-xl border border-slate-800 shadow-md">
+        <section class="bg-white dark:bg-slate-950 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-md">
             <div class="flex flex-col md:flex-row gap-4">
                 <div class="flex-1 relative">
                     <input type="text" id="searchInput" 
                         placeholder="Buscar por usuario, acción, módulo o contenido del payload (Ej: Revisor, Manual)..." 
-                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition">
+                        class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition">
                 </div>
                 <div class="flex gap-2">
                     <button onclick="realizarBusqueda()" class="bg-blue-600 hover:bg-blue-500 text-white font-medium px-6 py-3 rounded-lg transition shadow-lg cursor-pointer">
                         Buscar
                     </button>
-                    <button onclick="limpiarFiltros()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-4 py-3 rounded-lg transition cursor-pointer">
+                    <button onclick="limpiarFiltros()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 font-medium px-4 py-3 rounded-lg transition cursor-pointer">
                         Limpiar
                     </button>
                 </div>
             </div>
 
-            <div class="mt-4 flex flex-wrap items-center gap-2 text-sm text-slate-400">
-                <span class="font-medium text-slate-500">Filtrar por etiqueta ANSI:</span>
-                <button onclick="filtrarPorEtiqueta('modulo_3_nodejs')" class="bg-slate-800 hover:bg-slate-700 hover:text-white px-2.5 py-1 rounded-md text-xs font-mono transition cursor-pointer">#modulo_3_nodejs</button>
-                <button onclick="filtrarPorEtiqueta('revisor')" class="bg-slate-800 hover:bg-slate-700 hover:text-white px-2.5 py-1 rounded-md text-xs font-mono transition cursor-pointer">#revisor</button>
-                <button onclick="filtrarPorEtiqueta('search_document')" class="bg-slate-800 hover:bg-slate-700 hover:text-white px-2.5 py-1 rounded-md text-xs font-mono transition cursor-pointer">#search_document</button>
+            <div class="mt-4 flex flex-wrap items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                <span class="font-medium text-slate-400 dark:text-slate-500">Filtrar por etiqueta ANSI:</span>
+                <button onclick="filtrarPorEtiqueta('modulo_3_nodejs')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 dark:hover:text-white px-2.5 py-1 rounded-md text-xs font-mono transition cursor-pointer border border-slate-200 dark:border-transparent">#modulo_3_nodejs</button>
+                <button onclick="filtrarPorEtiqueta('revisor')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 dark:hover:text-white px-2.5 py-1 rounded-md text-xs font-mono transition cursor-pointer border border-slate-200 dark:border-transparent">#revisor</button>
+                <button onclick="filtrarPorEtiqueta('search_document')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 dark:hover:text-white px-2.5 py-1 rounded-md text-xs font-mono transition cursor-pointer border border-slate-200 dark:border-transparent">#search_document</button>
             </div>
         </section>
 
-        <div class="text-sm text-slate-400 flex justify-between items-center px-2">
-            <span>Resultados encontrados: <strong id="totalCounter" class="text-blue-400">0</strong></span>
-            <span class="text-xs text-slate-500">Persistencia: MongoDB BSON</span>
+        <div class="text-sm text-slate-500 dark:text-slate-400 flex justify-between items-center px-2">
+            <span>Resultados encontrados: <strong id="totalCounter" class="text-blue-600 dark:text-blue-400">0</strong></span>
+            <span class="text-xs text-slate-400 dark:text-slate-500">Persistencia: MongoDB BSON</span>
         </div>
 
         <section id="logsContainer" class="space-y-4">
-            <div class="text-center py-12 text-slate-500">
+            <div class="text-center py-12 text-slate-400 dark:text-slate-500">
                 Cargando metadatos del motor NoSQL...
             </div>
         </section>
@@ -67,8 +84,37 @@
     <script>
         const API_URL = 'http://localhost:3000/api/notificaciones/buscar';
 
-        // Al cargar la página, traer todos los registros de inmediato
+        // Lógica Avanzada para alternar el Tema Claro/Oscuro
+        function toggleTheme() {
+            const htmlElement = document.documentElement;
+            const themeBtn = document.getElementById('themeToggleBtn');
+            
+            if (htmlElement.classList.contains('dark')) {
+                htmlElement.classList.remove('dark');
+                localStorage.setItem('selected-theme', 'light');
+                themeBtn.innerHTML = '🌙 Modo Oscuro';
+            } else {
+                htmlElement.classList.add('dark');
+                localStorage.setItem('selected-theme', 'dark');
+                themeBtn.innerHTML = '🌞 Modo Claro';
+            }
+        }
+
+        // Modificación del DOMContentLoaded para jalar la persistencia del color guardado
         document.addEventListener('DOMContentLoaded', () => {
+            const htmlElement = document.documentElement;
+            const themeBtn = document.getElementById('themeToggleBtn');
+            const savedTheme = localStorage.getItem('selected-theme');
+            
+            // Si el usuario ya lo tenía en modo claro antes, respetarlo al recargar
+            if (savedTheme === 'light') {
+                htmlElement.classList.remove('dark');
+                themeBtn.innerHTML = '🌙 Modo Oscuro';
+            } else {
+                htmlElement.classList.add('dark');
+                themeBtn.innerHTML = '🌞 Modo Claro';
+            }
+
             realizarBusqueda();
 
             // Permitir buscar presionando la tecla Enter
@@ -95,7 +141,7 @@
 
                 if (!result.data || result.data.length === 0) {
                     container.innerHTML = `
-                        <div class="bg-slate-950 p-8 rounded-xl text-center text-slate-500 border border-slate-800 shadow-md">
+                        <div class="bg-white dark:bg-slate-950 p-8 rounded-xl text-center text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-md">
                             ❌ No se encontraron coincidencias en la indexación de MongoDB.
                         </div>`;
                     return;
@@ -105,46 +151,46 @@
                     // Dar formato legible al JSON dinámico
                     const jsonPretty = JSON.stringify(log.valores_nuevos, null, 4);
                     
-                    // Construir las insignias de las etiquetas
+                    // Construir las insignias de las etiquetas adaptadas a ambos modos
                     const badges = log.etiquetas.map(tag => 
-                        `<span class="bg-blue-950 text-blue-300 text-[11px] font-mono px-2 py-0.5 rounded border border-blue-800/50">#${tag}</span>`
+                        `<span class="bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 text-[11px] font-mono px-2 py-0.5 rounded border border-blue-200 dark:border-blue-800/50">#${tag}</span>`
                     ).join(' ');
 
                     const card = document.createElement('div');
-                    card.className = "bg-slate-950 rounded-xl border border-slate-800 shadow-lg overflow-hidden transition hover:border-slate-700";
+                    card.className = "bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-lg overflow-hidden transition hover:border-slate-300 dark:hover:border-slate-700";
                     card.innerHTML = `
-                        <div class="bg-slate-900/50 px-6 py-4 border-b border-slate-800 flex flex-wrap justify-between items-center gap-2">
+                        <div class="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex flex-wrap justify-between items-center gap-2">
                             <div class="flex items-center gap-3">
-                                <span class="bg-slate-800 text-slate-300 text-xs font-mono px-2 py-1 rounded">ID Relacional: ${log.id_referencia}</span>
-                                <span class="text-sm font-semibold text-white">${log.modulo_origen}</span>
+                                <span class="bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 text-xs font-mono px-2 py-1 rounded border border-slate-300 dark:border-transparent">ID Relacional: ${log.id_referencia}</span>
+                                <span class="text-sm font-semibold text-slate-900 dark:text-white">${log.modulo_origen}</span>
                             </div>
-                            <span class="text-xs text-slate-500">${new Date(log.fecha_registro).toLocaleString()}</span>
+                            <span class="text-xs text-slate-400 dark:text-slate-500">${new Date(log.fecha_registro).toLocaleString()}</span>
                         </div>
                         
                         <div class="p-6 space-y-4">
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                                 <div>
-                                    <span class="block text-xs font-medium text-slate-500 uppercase tracking-wider">Usuario Responsable</span>
-                                    <strong class="text-blue-400 font-mono">${log.usuario}</strong>
+                                    <span class="block text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">Usuario Responsable</span>
+                                    <strong class="text-blue-600 dark:text-blue-400 font-mono">${log.usuario}</strong>
                                 </div>
                                 <div>
-                                    <span class="block text-xs font-medium text-slate-500 uppercase tracking-wider">Acción Indexada</span>
-                                    <span class="inline-block mt-0.5 bg-slate-800 text-slate-200 text-xs font-bold px-2 py-0.5 rounded border border-slate-700">${log.accion}</span>
+                                    <span class="block text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">Acción Indexada</span>
+                                    <span class="inline-block mt-0.5 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200 text-xs font-bold px-2 py-0.5 rounded border border-slate-300 dark:border-slate-700">${log.accion}</span>
                                 </div>
                                 <div>
-                                    <span class="block text-xs font-medium text-slate-500 uppercase tracking-wider">Dirección IP Host</span>
-                                    <span class="font-mono text-slate-300 text-xs">${log.direccion_ip || 'N/D'}</span>
+                                    <span class="block text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">Dirección IP Host</span>
+                                    <span class="font-mono text-slate-600 dark:text-slate-300 text-xs">${log.direccion_ip || 'N/D'}</span>
                                 </div>
                             </div>
 
                             <div>
-                                <span class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-1.5">Tokens / Etiquetas ANSI Indexadas:</span>
+                                <span class="block text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">Tokens / Etiquetas ANSI Indexadas:</span>
                                 <div class="flex flex-wrap gap-1.5">${badges}</div>
                             </div>
 
                             <div>
-                                <span class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-1.5">Estructura Dinámica Documental (BSON Payload):</span>
-                                <pre class="bg-slate-900 border border-slate-800 p-4 rounded-lg text-slate-300 text-xs overflow-x-auto json-block">${escapeHtml(jsonPretty)}</pre>
+                                <span class="block text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">Estructura Dinámica Documental (BSON Payload):</span>
+                                <pre class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-xs overflow-x-auto json-block">${escapeHtml(jsonPretty)}</pre>
                             </div>
                         </div>
                     `;
@@ -153,7 +199,7 @@
 
             } catch (error) {
                 container.innerHTML = `
-                    <div class="bg-red-950/20 p-6 rounded-xl text-center text-red-400 border border-red-900/30 shadow-md">
+                    <div class="bg-red-50 text-red-600 dark:bg-red-950/20 p-6 rounded-xl text-center dark:text-red-400 border border-red-200 dark:border-red-900/30 shadow-md">
                         ❌ Error de comunicación con la API del microservicio de Node.js: ${error.message}
                     </div>`;
             }
